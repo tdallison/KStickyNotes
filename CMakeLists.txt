@@ -14,6 +14,7 @@ qt_add_executable(KStickyNotes
 
 qt_add_qml_module(KStickyNotes
     URI KStickyNotes
+    VERSION 1.0
     QML_FILES Note.qml
     RESOURCE_PREFIX /
 )
