@@ -10,7 +10,7 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Widgets)
 
-qt_add_executable(KStickyNotes
+qt_add_executable(KStickyNotesApp
     main.cpp
     NoteManager.cpp
     NoteManager.h
@@ -23,7 +23,7 @@ qt_add_qml_module(KStickyNotes
     RESOURCE_PREFIX /
 )
 
-target_link_libraries(KStickyNotes
+target_link_libraries(KStickyNotesApp
     PRIVATE
     Qt6::Core
     Qt6::Gui
@@ -34,7 +34,7 @@ target_link_libraries(KStickyNotes
 )
 
 # Install binary to /usr/bin inside the package
-install(TARGETS KStickyNotes DESTINATION bin)
+install(TARGETS KStickyNotesApp DESTINATION bin)
 
 # Debian Packaging section
 include(InstallRequiredSystemLibraries)
