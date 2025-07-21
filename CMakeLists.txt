@@ -3,7 +3,6 @@ project(KStickyNotes LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#AUTOMOC
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -21,7 +20,6 @@ qt_add_qml_module(KStickyNotes
     VERSION 1.0
     QML_FILES Note.qml
     RESOURCE_PREFIX /
-        OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/KStickyNotes"
 )
 
 target_link_libraries(KStickyNotesApp
@@ -34,10 +32,8 @@ target_link_libraries(KStickyNotesApp
     Qt6::Widgets
 )
 
-# Install binary to /usr/bin inside the package
 install(TARGETS KStickyNotesApp DESTINATION bin)
 
-# Debian Packaging section
 include(InstallRequiredSystemLibraries)
 
 set(CPACK_GENERATOR "DEB")

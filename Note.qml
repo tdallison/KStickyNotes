@@ -5,7 +5,7 @@ import QtQuick.Window 2.15
 Window {
     id: noteWindow
     width: 250
-    height: 300
+    height: 180
     visible: true
     color: currentColor
     flags: Qt.Tool | Qt.FramelessWindowHint
@@ -16,7 +16,14 @@ Window {
 
     onXChanged: noteManager.saveNote(noteWindow)
     onYChanged: noteManager.saveNote(noteWindow)
+    onWidthChanged: noteManager.saveNote(noteWindow)
+    onHeightChanged: noteManager.saveNote(noteWindow)
     onCurrentColorChanged: noteManager.saveNote(noteWindow)
+
+    MouseArea {
+        anchors.fill: parent
+        drag.target: noteWindow
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -67,6 +74,26 @@ Window {
                 color: "white"
                 font.pointSize: 12
                 onTextChanged: noteManager.saveNote(noteWindow)
+            }
+        }
+    }
+
+    Rectangle {
+        id: resizer
+        width: 20
+        height: 20
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: "gray"
+        z: 99
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.SizeFDiagCursor
+            drag.target: resizer
+            onPositionChanged: {
+                noteWindow.width += mouse.x
+                noteWindow.height += mouse.y
             }
         }
     }

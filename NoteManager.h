@@ -6,6 +6,7 @@
 #include <QVariantList>
 #include <QPoint>
 #include <QList>
+#include <QUuid>
 
 class NoteManager : public QObject {
     Q_OBJECT

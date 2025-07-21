@@ -1,78 +1,99 @@
 #include "NoteManager.h"
 #include <QJsonDocument>
-#include <QJsonArray>
 #include <QJsonObject>
 #include <QFile>
+#include <QDir>
 #include <QStandardPaths>
 #include <QQmlComponent>
 #include <QQuickWindow>
 #include <QDebug>
-#include <QDir>
 
 NoteManager::NoteManager(QQmlApplicationEngine* engine, QObject *parent)
     : QObject(parent), m_engine(engine) {}
+
+QString NoteManager::getNotePath(const QString &noteId) const {
+    QString basePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/notes";
+    QDir().mkpath(basePath);
+    return basePath + "/" + noteId + ".json";
+}
 
 void NoteManager::createNote(const QString &text, const QPoint &pos, const QString &color, const QString &noteId) {
     QQmlComponent component(m_engine, QUrl(QStringLiteral("qrc:/Note.qml")));
     QObject *note = component.create();
 
+    QString finalNoteId = noteId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces) : noteId;
+
     if (note) {
+        note->setProperty("noteId", finalNoteId);
         note->setProperty("text", text);
         note->setProperty("x", pos.x());
         note->setProperty("y", pos.y());
+        note->setProperty("width", 250);
+        note->setProperty("height", 180);
         note->setProperty("currentColor", color);
         m_noteWindows.append(note);
     }
 }
 
 void NoteManager::closeNote(QObject* window) {
+    if (!window) return;
+
+    QString noteId = window->property("noteId").toString();
+    QFile::remove(getNotePath(noteId));
+
     m_noteWindows.removeOne(window);
     window->deleteLater();
-    saveNotes();
 }
 
 void NoteManager::loadNotes() {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QFile file(path + "/notes.json");
-    if (!file.exists()) return;
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/notes";
+    QDir notesDir(dirPath);
+    if (!notesDir.exists()) return;
 
-    if (file.open(QIODevice::ReadOnly)) {
-        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-        for (const QJsonValue &val : doc.array()) {
-            QJsonObject obj = val.toObject();
+    QStringList files = notesDir.entryList(QStringList() << "*.json", QDir::Files);
+    for (const QString &fileName : files) {
+        QFile file(notesDir.filePath(fileName));
+        if (file.open(QIODevice::ReadOnly)) {
+            QJsonObject obj = QJsonDocument::fromJson(file.readAll()).object();
             QString text = obj["text"].toString();
             QPoint pos(obj["x"].toInt(), obj["y"].toInt());
             QString color = obj["color"].toString();
-            createNote(text, pos, color);
+            QString id = obj["id"].toString();
+            createNote(text, pos, color, id);
+            file.close();
         }
-        file.close();
-    }
-}
-
-void NoteManager::saveNotes() {
-    QJsonArray array;
-    for (QObject *note : m_noteWindows) {
-        QJsonObject obj;
-        obj["text"] = note->property("text").toString();
-        obj["x"] = note->property("x").toInt();
-        obj["y"] = note->property("y").toInt();
-        obj["color"] = note->property("currentColor").toString();
-        array.append(obj);
-    }
-
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(path);
-    QFile file(path + "/notes.json");
-    if (file.open(QIODevice::WriteOnly)) {
-        QJsonDocument doc(array);
-        file.write(doc.toJson());
-        file.close();
     }
 }
 
 void NoteManager::saveNote(QObject* window) {
     if (!window) return;
 
-    // Optionally: update existing note data (if implementing per-note saving)
-    saveNotes(); // Right now, just trigger a full save
+    QString noteId = window->property("noteId").toString();
+    QString text = window->property("text").toString();
+    int x = window->property("x").toInt();
+    int y = window->property("y").toInt();
+    int width = window->property("width").toInt();
+    int height = window->property("height").toInt();
+    QString color = window->property("currentColor").toString();
+
+    QJsonObject obj;
+    obj["id"] = noteId;
+    obj["text"] = text;
+    obj["x"] = x;
+    obj["y"] = y;
+    obj["width"] = width;
+    obj["height"] = height;
+    obj["color"] = color;
+
+    QFile file(getNotePath(noteId));
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(QJsonDocument(obj).toJson());
+        file.close();
+    }
+}
+
+void NoteManager::saveNotes() {
+    for (QObject* note : m_noteWindows) {
+        saveNote(note);
+    }
 }
