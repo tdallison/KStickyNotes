@@ -32,9 +32,6 @@ target_link_libraries(KStickyNotes
 # Install binary to /usr/bin inside the package
 install(TARGETS KStickyNotes DESTINATION bin)
 
-# Optional: install QML files (if not using resources)
-# install(FILES Note.qml DESTINATION share/kstickynotes/qml)
-
 # Debian Packaging section
 include(InstallRequiredSystemLibraries)
 
