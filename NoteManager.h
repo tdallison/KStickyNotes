@@ -15,6 +15,7 @@ public:
     Q_INVOKABLE void createNote(const QString &text = "", const QPoint &pos = QPoint(), const QString &color = "#FFDD00", const QString &noteId = "");
     Q_INVOKABLE void closeNote(QObject* window);
     Q_INVOKABLE void saveNote(QObject* window);
+    Q_INVOKABLE void saveNotes();
     void loadNotes();
 
 private:
