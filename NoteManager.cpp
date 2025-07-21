@@ -7,12 +7,12 @@
 #include <QQmlComponent>
 #include <QQuickWindow>
 #include <QDebug>
+#include <QDir>
 
 NoteManager::NoteManager(QQmlApplicationEngine* engine, QObject *parent)
     : QObject(parent), m_engine(engine) {}
 
-#void NoteManager::createNote(const QString &text, const QPoint &pos, const QString &color) {
-void NoteManager::createNote(const QString &text, const QPoint &pos, const QString &color, const QString &noteId)
+void NoteManager::createNote(const QString &text, const QPoint &pos, const QString &color, const QString &noteId) {
     QQmlComponent component(m_engine, QUrl(QStringLiteral("qrc:/Note.qml")));
     QObject *note = component.create();
 
