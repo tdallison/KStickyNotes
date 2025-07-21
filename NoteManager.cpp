@@ -69,3 +69,10 @@ void NoteManager::saveNotes() {
         file.close();
     }
 }
+
+void NoteManager::saveNote(QObject* window) {
+    if (!window) return;
+
+    // Optionally: update existing note data (if implementing per-note saving)
+    saveNotes(); // Right now, just trigger a full save
+}
