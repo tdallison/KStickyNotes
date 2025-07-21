@@ -20,6 +20,7 @@ qt_add_qml_module(KStickyNotes
     VERSION 1.0
     QML_FILES Note.qml
     RESOURCE_PREFIX /
+        OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/KStickyNotes"
 )
 
 target_link_libraries(KStickyNotesApp
